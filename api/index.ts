@@ -12,7 +12,7 @@ app.use(express.json()); //permite que nuestra api entienda el formato json
 
 // Conectamos a MongoDB usando Mongoose
 
-const mongoURI = process.env.MONGO_URI || 'mongodb://localhost:27017/fraseapi';
+const mongoURI = process.env.MONGO_URI || 'mongodb://localhost:27017/roomsdb';
 
 if (!mongoURI) {
   throw new Error ('Falta la variable de entorno');
@@ -38,23 +38,29 @@ async function connecttoMongo() {
 
 // Creamos el molde (Esquema para nuestras frases)
 
-const fraseSchema = new mongoose.Schema({
+const roomSchema = new mongoose.Schema({
 
-    text: String,
-    autor: String,
+    name: String,
+    category: String,
+    price: Number,
+    description: String,
+    imageUrl: String,
+    keyicon: String,
+    amenities: [String],
+
 },
 {
-    collection:"Frasesclase"
+    collection:"Rooms" // Especificamos el nombre de la colección en MongoDB
 }
 
 )
 
-const Frase = mongoose.models.Frases || mongoose.model('Frases', fraseSchema);
+const Rooms = mongoose.models.Rooms || mongoose.model('Rooms', roomSchema);
 
 function getMongoDebugInfo() {
     return {
         database: currentDatabase || mongoose.connection.name,
-        collection: Frase.collection.name,
+        collection: Rooms.collection.name,
         readyState: mongoose.connection.readyState,
     };
 }
@@ -62,7 +68,7 @@ function getMongoDebugInfo() {
 // crearemos todas las rutas, get, post, put, delete
 
 // Para debugear la conexión a MongoDB y ver el estado de la conexión, la base de datos actual y la colección utilizada, añadimos esta ruta:
-app.get("/api/debug-db", async(req: Request, res: Response) => {
+app.get("/api/rooms-db", async(req: Request, res: Response) => {
 
     try {
         await connecttoMongo();
@@ -76,12 +82,12 @@ app.get("/api/debug-db", async(req: Request, res: Response) => {
 
 //Get de todas las frases
 
-app.get('/api/frases', async (req: Request, res: Response) => {
+app.get('/api/rooms', async (req: Request, res: Response) => {
 
     try {
         await connecttoMongo();
-        const frases = await Frase.find();
-        res.json(frases)
+        const rooms = await Rooms.find();
+        res.json(rooms)
 
     } catch (error) {
         console.error("Error al conectar a MongoDB:", error);
@@ -89,19 +95,21 @@ app.get('/api/frases', async (req: Request, res: Response) => {
     }
 })
 
-app.post('/api/frases', async (req: Request, res: Response) => {
+app.post('/api/rooms', async (req: Request, res: Response) => {
 
     try {
 
-        const {text, autor} = req.body;
-        if (!text || !autor) {
-            res.status(400).json({ error: "debes enviar texto y autor" });
+        const {name, category, price, description, imageUrl} = req.body;
+        if (!name || !category || !price) {
+            res.status(400).json({ error: "debes enviar nombre, categoría y precio" });
 
         }
+        const finalimageUrl = imageUrl || "https://via.placeholder.com/150"; // Si no se proporciona una URL de imagen, se asigna una imagen por defecto
+
         await connecttoMongo();
-        const nuevaFrase = new Frase({text, autor});//Toma los datos que envia el usuario
-        await nuevaFrase.save(); // Lo gurada en la ase de datos
-        res.status(201).json(nuevaFrase); // 201 es ok elemento creado 
+        const nuevoRoom = new Rooms({name, category, price, description, imageUrl: finalimageUrl });//Toma los datos que envia el usuario
+        await nuevoRoom.save(); // Lo gurada en la ase de datos
+        res.status(201).json(nuevoRoom); // 201 es ok elemento creado
 
     } catch (error) {
         console.error("Error al crear la frase:", error);
