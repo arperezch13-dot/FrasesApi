@@ -100,8 +100,8 @@ app.post('/api/rooms', async (req: Request, res: Response) => {
     try {
 
         const {name, category, price, description, imageUrl} = req.body;
-        if (!name || !category || !price) {
-            res.status(400).json({ error: "debes enviar nombre, categoría y precio" });
+        if (!name || !category || !price || !description || !imageUrl) {
+            res.status(400).json({ error: "you must send name, category, price, description and image URL" });
 
         }
         const finalimageUrl = imageUrl || "https://via.placeholder.com/150"; // Si no se proporciona una URL de imagen, se asigna una imagen por defecto
@@ -112,7 +112,7 @@ app.post('/api/rooms', async (req: Request, res: Response) => {
         res.status(201).json(nuevoRoom); // 201 es ok elemento creado
 
     } catch (error) {
-        console.error("Error al crear la frase:", error);
+        console.error("Error al crear el room:", error);
         res.status(500).json({ error: 'Error', detail:error instanceof Error ? error.message : 'Error desconocido' });
     }
 })
