@@ -59,3 +59,55 @@ function getMongoDebugInfo() {
     };
 }
   
+// crearemos todas las rutas, get, post, put, delete
+
+// Para debugear la conexión a MongoDB y ver el estado de la conexión, la base de datos actual y la colección utilizada, añadimos esta ruta:
+app.get("/api/debug-db", async(req: Request, res: Response) => {
+
+    try {
+        await connecttoMongo();
+        res.json(getMongoDebugInfo());
+    } catch (error) {
+        console.error("Error al conectar a MongoDB:", error);
+        res.status(500).json({ error: 'Error', detail:error instanceof Error ? error.message : 'Error desconocido' });
+    }
+
+})
+
+//Get de todas las frases
+
+app.get('/api/frases', async (req: Request, res: Response) => {
+
+    try {
+        await connecttoMongo();
+        const frases = await Frase.find();
+        res.json(frases)
+
+    } catch (error) {
+        console.error("Error al conectar a MongoDB:", error);
+        res.status(500).json({ error: 'Error', detail:error instanceof Error ? error.message : 'Error desconocido' });
+    }
+})
+
+app.post('/api/frases', async (req: Request, res: Response) => {
+
+    try {
+
+        const {text, autor} = req.body;
+        if (!text || !autor) {
+            res.status(400).json({ error: "debes enviar texto y autor" });
+
+        }
+        await connecttoMongo();
+        const nuevaFrase = new Frase({text, autor});//Toma los datos que envia el usuario
+        await nuevaFrase.save(); // Lo gurada en la ase de datos
+        res.status(201).json(nuevaFrase); // 201 es ok elemento creado 
+
+    } catch (error) {
+        console.error("Error al crear la frase:", error);
+        res.status(500).json({ error: 'Error', detail:error instanceof Error ? error.message : 'Error desconocido' });
+    }
+})
+
+export default app;
+   
