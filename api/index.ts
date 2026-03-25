@@ -44,7 +44,7 @@ const roomSchema = new mongoose.Schema({
     category: String,
     price: Number,
     description: String,
-    amenities: Array,
+    amenities: {type: [String], default: []} // Array de strings para las comodidades, con valor por defecto de array vacío
 
 },
 {
