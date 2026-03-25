@@ -44,8 +44,6 @@ const roomSchema = new mongoose.Schema({
     category: String,
     price: Number,
     description: String,
-    imageUrl: String,
-    keyicon: String,
     amenities: [String],
 
 },
@@ -99,15 +97,14 @@ app.post('/api/rooms', async (req: Request, res: Response) => {
 
     try {
 
-        const {name, category, price, description, imageUrl} = req.body;
-        if (!name || !category || !price || !description || !imageUrl) {
-            res.status(400).json({ error: "you must send name, category, price, description and image URL" });
+        const {name, category, price, description} = req.body;
+        if (!name || !category || !price || !description) {
+            res.status(400).json({ error: "you must send name, category, price and description" });
 
         }
-        const finalimageUrl = imageUrl || "https://via.placeholder.com/150"; // Si no se proporciona una URL de imagen, se asigna una imagen por defecto
 
         await connecttoMongo();
-        const nuevoRoom = new Rooms({name, category, price, description, imageUrl: finalimageUrl });//Toma los datos que envia el usuario
+        const nuevoRoom = new Rooms({name, category, price, description});//Toma los datos que envia el usuario
         await nuevoRoom.save(); // Lo gurada en la ase de datos
         res.status(201).json(nuevoRoom); // 201 es ok elemento creado
 
