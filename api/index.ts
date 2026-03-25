@@ -97,15 +97,15 @@ app.post('/api/rooms', async (req: Request, res: Response) => {
 
     try {
 
-        const {name, category, price, description} = req.body;
-        if (!name || !category || !price || !description) {
+        const {name, category, price, description, amenities} = req.body;
+        if (!name || !category || !price || !description || amenities && !Array.isArray(amenities)) {
             res.status(400).json({ error: "you must send name, category, price and description" });
 
         }
 
         await connecttoMongo();
-        const nuevoRoom = new Rooms({name, category, price, description});//Toma los datos que envia el usuario
-        await nuevoRoom.save(); // Lo gurada en la ase de datos
+        const nuevoRoom = new Rooms({name, category, price, description, amenities});//Toma los datos que envia el usuario
+        await nuevoRoom.save(); // Lo guarda en la ase de datos
         res.status(201).json(nuevoRoom); // 201 es ok elemento creado
 
     } catch (error) {
