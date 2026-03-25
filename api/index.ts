@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import cors from 'cors';
 
 // Activamos las variables de entorno de  nuestro archivo secreto 
 
@@ -8,6 +9,7 @@ dotenv.config();
 
 // Creamos la aplicación de Express
 const app = express();
+app.use(cors()); // Habilita CORS para permitir solicitudes desde cualquier origen
 app.use(express.json()); //permite que nuestra api entienda el formato json
 
 // Conectamos a MongoDB usando Mongoose
