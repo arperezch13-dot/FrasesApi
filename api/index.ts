@@ -44,7 +44,7 @@ const roomSchema = new mongoose.Schema({
     category: String,
     price: Number,
     description: String,
-    amenities: [String],
+    amenities: Array,
 
 },
 {
